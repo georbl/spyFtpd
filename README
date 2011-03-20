@@ -1,0 +1,7 @@
+
+About
+=====
+
+spyFtpd is a very simple command line interface for (http://code.google.com/p/pyftpdlib/).
+It emphasises on easy handling in order to start and stop an Ftp server without any
+configuration. Security issues are not in the main focus of the program.
