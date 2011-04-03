@@ -1,7 +1,13 @@
-
 About
 =====
 
-spyFtpd is a very simple command line interface for (http://code.google.com/p/pyftpdlib/).
-It emphasises on easy handling in order to start and stop an Ftp server without any
-configuration. Security issues are not in the main focus of the program.
+spyFtpD (simple python Ftp Daemon)  is a very simple command line interface for
+the python library pyftpdlib which provides the functionality to start a FTP
+server (http://code.google.com/p/pyftpdlib/).
+
+spyFtpD emphasizes on easy handling in order to start and stop an FTP server 
+without any configuration work.
+
+Security issues are not in the main focus of the program. 
+There exist a bunch of better solutions out there in case you want to
+set up a stable and secure FTP server with good performance.

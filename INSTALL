@@ -1,0 +1,18 @@
+Preconditions
+=============
+
+* Python (version > 2.6, in case you want to use SSL)
+* pyopenssl (in case you want to use SSL)
+
+Remark: spyFtpD already ships with a compatible version of the
+        python ftpd library
+
+Starting
+========
+
+1. Download spyFtpD
+2. cd <spyFtpD download directory>/src
+3. ./spyftpd.py -a .
+
+This starts a server with root in the current directory and
+read access for anomyous
