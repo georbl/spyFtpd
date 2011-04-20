@@ -36,13 +36,16 @@ Created on Apr 3, 2011
 @author: Georg Blaschke
 '''
 
-import os, sys, logging
+import os, sys, logging, tempfile
 import warnings
 from lib.pyftpdlib import ftpserver
 from lib.pyftpdlib.contrib.handlers import TLS_FTPHandler
 from lib.configparse import OptionParser, OptionGroup
 from lib.IndentedHelpFormatterWithNL import IndentedHelpFormatterWithNL
-
+try:
+    from OpenSSL import crypto
+except ImportError:
+    pass
 
 __pname__ = 'spyFtpD (simple python Ftp Daemon)'
 __ver__ = '0.1.0'
@@ -134,7 +137,15 @@ Write permissions:
     # set log level
     _log.setLevel(self._options.Verbose)
 
-    # print information 
+    # check if certificate file exits in case SSL is used and file name is given
+    createdCertificateFile = False
+    if ((self._options.UseSsl == True)
+        and (self._options.SslCertificate == None)):
+      self._options.SslCertificate = self.createCertificateFile()
+      createdCertificateFile = True
+
+
+    # print information
     _log.info("-------------------------------------")
     _log.info("Address:                 %s" % self._options.Address)
     _log.info("Port:                    %d" % self._options.Port)
@@ -159,9 +170,6 @@ Write permissions:
       ftp_handler = ftpserver.FTPHandler
 
     # setup authorization
-
-
-
     ftp_handler.authorizer = self.createAuthorizer()
 
     # start ftp server
@@ -175,16 +183,22 @@ Write permissions:
 
     FtpD.serve_forever()
 
+    # Cleanup after FTP server is stopped
+    if (createdCertificateFile == True):
+      _log.info("Removing certificate file '%s'" % self._options.SslCertificate)
+      os.remove(self._options.SslCertificate)
+
+
 
   def createAuthorizer(self):
     '''
-    Create authorizer for ftp server using the user information in the options object 
+    Create authorizer for ftp server using the user information in the options object
     '''
 
     # create authorizer object
     authorizer = ftpserver.DummyAuthorizer()
 
-    # fill authorizer with information from _options 
+    # fill authorizer with information from _options
     for usercfg in self._options.User:
       user = None
       directories = None
@@ -200,7 +214,7 @@ Write permissions:
         sys.exit(1)
 
 
-      # set default permissions (allow everthing)
+      # set default permissions (allow every action)
       if (perm == ""):
         perm = "elradfmw"
 
@@ -240,7 +254,7 @@ Write permissions:
 
   def getOptions(self):
     '''
-    parse options from on the command line and from the configuration file  
+    parse options from on the command line and from the configuration file
     '''
 
     parser = OptionParser(usage=self._usage, formatter=IndentedHelpFormatterWithNL())
@@ -317,9 +331,9 @@ Write permissions:
         Address="0.0.0.0",
         Port=2121,
 
-        #Ssl Options
+        #SSL Options
         UseSsl=False,
-        SslCertificate=self._spyFtpdPath + "/defaultCert.pem",
+        SslCertificate=None,
 
         # Authentication Options
         User=[],
@@ -331,29 +345,70 @@ Write permissions:
     )
     (self._options, args) = parser.parse_args()
 
+    # reset list of user so that they don't get added twice 
+    parser.set_defaults(User=[])
 
-    parser.set_defaults(
-        # Authentication _options
-        User=[],
-    )
-    #parse options again using a configfile
+    # parse options again using a configuration file
     (self._options, args) = parser.parse_args(files=[os.path.expandvars(self._options.ConfigFile)])
 
-
+    # write configuration file 
     if (self._options.CreateConfig == True):
       configFile = open(os.path.expandvars(self._options.ConfigFile), 'w')
       parser.write(configFile)
       configFile.close()
       sys.exit(0)
 
-
-    # check certificate file exits in case SSL is used
+    # check if certificate file exits in case SSL is used and file name is given
     if ((self._options.UseSsl == True)
+        and (self._options.SslCertificate != None)
         and (os.path.isfile(self._options.SslCertificate) != True)):
       _log.error("SSL certificate file doesn't exist: '%s'" % self._options.SslCertificate)
       sys.exit(1);
 
 
+  def createCertificateFile(self):
+    '''
+    create default certificate on the fly
+    '''
+
+    ## create key
+    pkey = crypto.PKey()
+    pkey.generate_key(crypto.TYPE_RSA, 1024)
+
+    # create certificate request
+    req = crypto.X509Req()
+    subj = req.get_subject()
+    attributes = {'ST':'Sto Plains', 'L':'Ankh-Morpork', 'O':'The Smoking Gnu'}
+
+    for (key, value) in attributes.items():
+      setattr(subj, key, value)
+
+    req.set_pubkey(pkey)
+    req.sign(pkey, 'md5')
+
+    # create certificate
+    cert = crypto.X509()
+    cert.set_serial_number(0)
+    cert.gmtime_adj_notBefore(0)
+
+    # certificate is valid for 1 day
+    cert.gmtime_adj_notAfter(60 * 60 * 24)
+    cert.set_issuer(subj)
+    cert.set_subject(subj)
+    cert.set_pubkey(pkey)
+    cert.sign(pkey, 'md5')
+
+    # write certificate to file
+    temp = tempfile.NamedTemporaryFile(suffix='.pem',
+                                   prefix='spyFtpDCert',
+                                   delete=False,
+                                   mode='w'
+                                   )
+    _log.info("Writing private key and certificate into file '%s'" % temp.name)
+    temp.write(crypto.dump_privatekey(crypto.FILETYPE_PEM, pkey))
+    temp.write(crypto.dump_certificate(crypto.FILETYPE_PEM, cert))
+    temp.close
+    return temp.name
 
 
 
