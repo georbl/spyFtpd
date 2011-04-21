@@ -408,6 +408,8 @@ Write permissions:
     temp.write(crypto.dump_privatekey(crypto.FILETYPE_PEM, pkey))
     temp.write(crypto.dump_certificate(crypto.FILETYPE_PEM, cert))
     temp.close
+    print "MD5   Fingerprint of created certificate: %s " % cert.digest('md5')
+    print "SHA-1 Fingerprint of created certificate: %s " % cert.digest('sha1')
     return temp.name
 
 
