@@ -39,11 +39,11 @@ Created on Apr 3, 2011
 import os, sys, logging, tempfile
 import warnings
 from lib.pyftpdlib import ftpserver
-from lib.pyftpdlib.contrib.handlers import TLS_FTPHandler
 from lib.configparse import OptionParser, OptionGroup
 from lib.IndentedHelpFormatterWithNL import IndentedHelpFormatterWithNL
 try:
     from OpenSSL import crypto
+    from lib.pyftpdlib.contrib.handlers import TLS_FTPHandler
 except ImportError:
     pass
 
@@ -345,13 +345,13 @@ Write permissions:
     )
     (self._options, args) = parser.parse_args()
 
-    # reset list of user so that they don't get added twice 
+    # reset list of user so that they don't get added twice
     parser.set_defaults(User=[])
 
     # parse options again using a configuration file
     (self._options, args) = parser.parse_args(files=[os.path.expandvars(self._options.ConfigFile)])
 
-    # write configuration file 
+    # write configuration file
     if (self._options.CreateConfig == True):
       configFile = open(os.path.expandvars(self._options.ConfigFile), 'w')
       parser.write(configFile)
