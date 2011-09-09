@@ -146,7 +146,6 @@ Write permissions:
 
 
     # print information
-    _log.info("-------------------------------------")
     _log.info("Address:                 %s" % self._options.Address)
     _log.info("Port:                    %d" % self._options.Port)
     _log.info("Ssl:                     %s" % self._options.UseSsl)
@@ -155,8 +154,6 @@ Write permissions:
     _log.info("Users:                               ")
     for user in self._options.User:
       _log.info("  %s" % user)
-    _log.info("-------------------------------------")
-    _log.info("-------------------------------------")
 
 
     # create FTP server handle
