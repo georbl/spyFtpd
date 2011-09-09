@@ -36,7 +36,7 @@ Created on Apr 3, 2011
 @author: Georg Blaschke
 '''
 
-import os, sys, logging, tempfile
+import os, sys, logging, tempfile, socket
 import warnings
 from lib.pyftpdlib import ftpserver
 from lib.configparse import OptionParser, OptionGroup
@@ -169,6 +169,32 @@ Write permissions:
     # setup authorization
     ftp_handler.authorizer = self.createAuthorizer()
 
+    # Use masquerared IP address for passive replies
+    if (self._options.Masquerade != None):
+      masquerade_address = socket.gethostbyname(self._options.Masquerade)
+      ftp_handler.masquerade_address = masquerade_address
+      _log.info("Masquerade IP address: %s" % masquerade_address)
+
+    # Use custom range of passive ports
+    if (self._options.PassivePorts != None):
+      # extract numbers from argument
+      (rangeStartStr,rangeEndStr) = self._options.PassivePorts.split('-', 2)
+
+      #convert to integers
+      try:
+        rangeStart = int(rangeStartStr)
+        rangeEnd = int(rangeEndStr)
+      except ValueError, msg:
+        _log.error("Wrong format in range of passive ports: %s" % msg)
+        sys.exit(1)
+      # check if range is valid
+      if ((int(rangeStart) < 0) or (int(rangeEnd) < int(rangeStart))):
+        _log.error("Invalid range from %d to %d: " % (rangeStart,rangeEnd))
+        sys.exit(1)
+      # use the range
+      _log.info("Passive Port Range: %d to %d" % (rangeStart,rangeEnd))
+      ftp_handler.passive_ports = range(rangeStart,rangeEnd)
+
     # start ftp server
     _log.info("Starting FTP Server")
     Adress_Port = (self._options.Address, self._options.Port)
@@ -267,6 +293,14 @@ Write permissions:
                     type="int", dest="Port", config="true",
                     help="Port of the server to listen on [default: %default]"
                     )
+    networkSettingGroup.add_option("-m", "--masquerade",
+                    type="string", dest="Masquerade", config="true",
+                    help="Public Host name or IP address used when running\nbehind a Router (or similar)\n * Example:\n   \"myhost.dyndns.org\" or \"192.168.5.34\""
+                    )
+    networkSettingGroup.add_option("--passive-ports",
+                    type="string", dest="PassivePorts", config="true",
+                    help="Range of ports used for passive data transfers\n * Format: <start range>-<end range>\n * Example: 60001-65000"
+                    )
     parser.add_option_group(networkSettingGroup)
 
     # Ssl Settings
@@ -327,6 +361,8 @@ Write permissions:
         # Network _options
         Address="0.0.0.0",
         Port=2121,
+        Masquerade=None,
+        PassivePorts=None,
 
         #SSL Options
         UseSsl=False,
