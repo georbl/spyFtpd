@@ -41,14 +41,16 @@ import warnings
 from lib.pyftpdlib import ftpserver
 from lib.configparse import OptionParser, OptionGroup
 from lib.IndentedHelpFormatterWithNL import IndentedHelpFormatterWithNL
+
+sslAvailable=True
 try:
     from OpenSSL import crypto
     from lib.pyftpdlib.contrib.handlers import TLS_FTPHandler
 except ImportError:
-    pass
+    sslAvailable = False
 
 __pname__ = 'spyFtpD (simple python Ftp Daemon)'
-__ver__ = '0.1.0'
+__ver__ = '0.1.1'
 
 
 class SpyFtpD(object):
@@ -384,12 +386,12 @@ Write permissions:
     # parse options again using a configuration file
     (self._options, args) = parser.parse_args(files=[os.path.expandvars(self._options.ConfigFile)])
 
-    # write configuration file
-    if (self._options.CreateConfig == True):
-      configFile = open(os.path.expandvars(self._options.ConfigFile), 'w')
-      parser.write(configFile)
-      configFile.close()
-      sys.exit(0)
+
+    # check if ssl should be used but is not available
+    if ((self._options.UseSsl == True )
+        and (sslAvailable == False)):
+      _log.error("SSL is not available. Check if Python wrapper for OpenSSL wrapper is installed.")
+      sys.exit(1);
 
     # check if certificate file exits in case SSL is used and file name is given
     if ((self._options.UseSsl == True)
@@ -397,6 +399,14 @@ Write permissions:
         and (os.path.isfile(self._options.SslCertificate) != True)):
       _log.error("SSL certificate file doesn't exist: '%s'" % self._options.SslCertificate)
       sys.exit(1);
+
+    # write configuration file
+    if (self._options.CreateConfig == True):
+      configFile = open(os.path.expandvars(self._options.ConfigFile), 'w')
+      parser.write(configFile)
+      configFile.close()
+      sys.exit(0)
+
 
 
   def createCertificateFile(self):
