@@ -46,7 +46,8 @@ sslAvailable=True
 try:
     from OpenSSL import crypto
     from lib.pyftpdlib.contrib.handlers import TLS_FTPHandler
-except ImportError:
+except ImportError as e:
+    print e
     sslAvailable = False
 
 __pname__ = 'spyFtpD (simple python Ftp Daemon)'

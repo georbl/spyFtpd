@@ -4,7 +4,107 @@ Bug tracker at http://code.google.com/p/pyftpdlib/issues/list
 History
 =======
 
-Version: 0.6.0 - Date: 2010-01-24
+Version: 0.7.0 - Date: 2012-01-25
+---------------------------------
+
+Enhancements:
+
+ * Issue #152: uploads (from server to client) on UNIX are now from 2x (Linux)
+   to 3x (OSX) faster because of sendfile(2) system call usage.
+
+ * Issue #155: AbstractedFS "root" and "cwd" are no longer read-only properties
+   but can be set via setattr().
+
+ * Issue #168: added FTPHandler.logerror() method. It can be overridden to
+   provide more information (e.g. username) when logging exception tracebacks.
+
+ * Issue #174: added support for SITE CHMOD command (change file mode).
+
+ * Issue #177: setuptools is now used in setup.py
+
+ * Issue #178: added anti flood script in demo directory.
+
+ * Issue #181: added CallEvery class to call a function every x seconds.
+
+ * Issue #185: pass Debian licenscheck tool.
+
+ * Issue #189: the internal scheduler has been rewritten from scratch and it is
+   an order of magnitude faster, especially for operations like cancel() which
+   are involved when clients are disconnected (hence invoked very often).
+   Some benchmarks:
+       schedule   : +0.5x
+       reschedule : +1.7x
+       cancel     : +477x  (with 1 milion scheduled functions)
+       run:       : +8x
+    Also, a single scheduled function now consumes 1/3 of the memory thanks
+    to __slots__ usage.
+
+ * Issue 195: enhanced unix_daemon.py script which (now uses python-daemon
+   library).
+
+ * Issue #196: added callback for failed login attempt.
+
+ * Issue #200: FTPServer.server_forever() is now a class method.
+
+ * Issue #202: added benchmark script.
+
+Bugfixes:
+
+ * Issue #156: data connection must be closed before sending 226/426 reply.
+   This was against RFC-959 and was causing problems with older FTP clients.
+
+ * Issue #161: MLSD 'unique' fact can provide the same value for files having a
+   similar device/inode but that in fact are different.
+   (patch by Andrew Scheller)
+
+ * Issue #162: (FTPS) SSL shutdown() is not invoked for the control connection.
+
+ * Issue #163: FEAT erroneously reports MLSD. (patch by Andrew Scheller)
+
+ * Issue #166: (FTPS) an exception on send() can cause server to crash (DoS).
+
+ * Issue #167: fix some typos returned on HELP.
+
+ * Issue #170: PBSZ and PROT commands are now allowed before authentication
+   fixing problems with non-compliant FTPS clients.
+
+ * Issue #171: (FTPS) an exception when shutting down the SSL layer can cause
+   server to crash (DoS).
+
+ * Issue #173: file last modification time shown in LIST response might be in a
+   language different than English causing problems with some clients.
+
+ * Issue #175: FEAT response now omits to show those commands which are removed
+   from proto_cmds map.
+
+ * Issue #176: SO_REUSEADDR option is now used for passive data sockets to
+   prevent server running out of free ports when using passive_ports directive.
+
+ * Issue #187: match proftpd LIST format for files having last modification time
+   > 6 months.
+
+ * Issue #188: fix maximum recursion depth exceeded exception occurring if
+   client quickly connects and disconnects data channel.
+
+ * Issue #191: (FTPS) during SSL shutdown() operation the server can end up in
+   an infinite loop hogging CPU resources.
+
+ * Issue #199: UnixAuthorizer with require_valid_shell option is broken.
+
+Major API changes since 0.6.0:
+
+ * New FTPHandler.use_sendfile attribute.
+    * sendfile() is now automatically used instead of plain send() if
+      pysendfile module is installed.
+ * FTPServer.serve_forever() is a classmethod.
+ * AbstractedFS root and cwd properties can now be set via setattr().
+ * New CallLater class.
+ * New FTPHandler.on_login_failed(username, password) method.
+ * New FTPHandler.logerror(msg) method.
+ * New FTPHandler.log_exception(instance) method.
+
+
+Version: 0.6.0 - Date: 2011-01-24
 ---------------------------------
 
 Enhancements:

@@ -1,5 +1,34 @@
 #!/usr/bin/env python
-# $Id: authorizers.py 776 2010-12-10 20:50:26Z g.rodola $
+# $Id: authorizers.py 979 2012-01-23 19:32:22Z g.rodola $
+
+#  pyftpdlib is released under the MIT license, reproduced below:
+#  ======================================================================
+#  Copyright (C) 2007-2012 Giampaolo Rodola' <g.rodola@gmail.com>
+#
+#                         All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person
+# obtaining a copy of this software and associated documentation
+# files (the "Software"), to deal in the Software without
+# restriction, including without limitation the rights to use,
+# copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following
+# conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+# OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
+#
+#  ======================================================================
 
 """An "authorizer" is a class handling authentications and permissions
 of the FTP server. It is used by pyftpdlib.ftpserver.FTPHandler
@@ -20,7 +49,7 @@ __all__ = []
 import os
 import errno
 
-from ..ftpserver import DummyAuthorizer, AuthorizerError
+from pyftpdlib.ftpserver import DummyAuthorizer, AuthorizerError
 
 
 def replace_anonymous(callable):
@@ -149,7 +178,7 @@ else:
                 if not self.anonymous_user in self._get_system_users():
                     raise ValueError('no such user %s' % self.anonymous_user)
                 try:
-                    return pwd.getpwnam(self.anonymous_user).pw_dir
+                    pwd.getpwnam(self.anonymous_user).pw_dir
                 except KeyError:
                     raise ValueError('no such user %s' % anonymous_user)
 
@@ -350,15 +379,19 @@ else:
             """Return True if the user has a valid shell binary listed
             in /etc/shells. If /etc/shells can't be found return True.
             """
+            file = None
             try:
-                file = open('/etc/shells', 'r')
-            except IOError, err:
-                if err.errno == errno.ENOENT:
-                    return True
-                raise
-            else:
                 try:
-                    shell = pwd.getpwnam(username).pw_shell
+                    file = open('/etc/shells', 'r')
+                except IOError, err:
+                    if err.errno == errno.ENOENT:
+                        return True
+                    raise
+                else:
+                    try:
+                        shell = pwd.getpwnam(username).pw_shell
+                    except KeyError:  # invalid user
+                        return False
                     for line in file:
                         if line.startswith('#'):
                             continue
@@ -366,7 +399,8 @@ else:
                         if line == shell:
                             return True
                     return False
-                finally:
+            finally:
+                if file is not None:
                     file.close()
 
 
@@ -388,10 +422,12 @@ else:
 
         def __init__(self, anonymous_user=None, anonymous_password=None):
             # actually try to impersonate the user
+            self.anonymous_user = anonymous_user
+            self.anonymous_password = anonymous_password
             if self.anonymous_user is not None:
                 self.impersonate_user(self.anonymous_user,
                                       self.anonymous_password)
-                self.terminate_impersonation
+                self.terminate_impersonation()
 
         def validate_authentication(self, username, password):
             if username == "anonymous":
@@ -535,7 +571,7 @@ else:
             if self.anonymous_user is not None:
                 self.impersonate_user(self.anonymous_user,
                                       self.anonymous_password)
-                self.terminate_impersonation
+                self.terminate_impersonation()
 
         def override_user(self, username, password=None, homedir=None, perm=None,
                           msg_login=None, msg_quit=None):
@@ -584,4 +620,3 @@ else:
             if overridden_home:
                 return overridden_home
             return BaseWindowsAuthorizer.get_home_dir(self, username)
-
