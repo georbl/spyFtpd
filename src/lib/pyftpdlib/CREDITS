@@ -23,7 +23,7 @@ D: Original pyftpdlib author and maintainer
 N: Jay Loden
 C: NJ, USA
 E: jloden@gmail.com
-W: http://www.jayloden.com
+W: http://jayloden.com/About.htm
 D: OS X and Linux platform development/testing
 
 N: Silas Sewell
@@ -42,11 +42,33 @@ D: FreeBSD port maintainer
 Contributors
 ============
 
+N: Miro Hrončok
+W: https://github.com/hroncok
+D: 656
+
+N: hakai
+W: https://github.com/hakai
+D: 613
+
+N: Benedikt McMullin
+W: https://github.com/moben
+D: 612
+
+N: Tailing Yuan
+W: https://github.com/yuantailing
+D: 505
+
 N: Anatoly Techtonik
 C: Belarus
 E: techtonik@gmail.com
 D: Inclusion of pyftpdlib in Far Manager, a file and archive manager for Windows
    http://www.farmanager.com/enforum/viewtopic.php?t=640&highlight=&sid=12d4d90f27f421243bcf7a0e3c516efb.
+
+N: Andrew Shulgin
+C: Ukraine
+E: andrewshulginua@gmail.com
+D: Fixing CR duplication in ASCII mode downloads.
+   https://github.com/giampaolo/pyftpdlib/pull/492
 
 N: Arkadiusz Wahlig
 C: Germany
@@ -129,7 +151,7 @@ D: Bug report #104 (socket.accept() might return None instead of a valid address
 N: Ben Timby
 E: btimby@gmail.com
 C: USA
-D: (issue #127) multiple masqueraded IP addresses patch.
+D: issues 127, 229, 265
 
 N: Bernd Deichmann
 W: http://deichmann-edv.de/
@@ -147,3 +169,51 @@ D: issue 187
 N: Darren Worrall
 E: darren.worrall@gmail.com
 D: issue 198
+
+N: Suzan Shakya
+E: suzan.shakya@gmail.com
+D: issue 211
+
+N: Claus Klein
+E: claus.klein.sha@googlemail.com
+D: issue 232
+
+N: Arfrever Frehtes Taifersar Arahesis
+E: arfrever.fta@gmail.com
+D: issue 239
+
+N: tlockert
+D: issue 238
+
+N: Juan J. Martinez
+E: juan@memset.com
+D: issue 263
+
+N: Michael Ross
+E: michaelross757@gmail.com
+D: issue 273
+
+E: dn@devicenull.org
+D: issue 280
+
+N: Dmitry Panov
+C: UK
+E: dop251@gmail.com
+D: issue 262
+
+M: PonyPC
+W: https://github.com/PonyPC
+D: issue 403
+
+N: Tory Law
+E: git@torypages.com
+C: Canada
+D: Command line argument enhancements
+
+N: Tahir Ijaz
+W: https://github.com/tahirijaz24
+D: issue 201, 435
+
+N: Sandro
+W: https://github.com/penguinpee
+D: issue 637
