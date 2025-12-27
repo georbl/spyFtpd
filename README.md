@@ -1,0 +1,33 @@
+# About
+
+
+spyFtpD (Simple Python FTP Daemon) is a lightweight command‑line wrapper around the pyftpdlib library , giving you a quick way to launch an FTP server without dealing with configuration files or setup overhead. Its focus is straightforward operation — starting and stopping an FTP server with minimal effort.
+
+Security and hardening are intentionally not priorities of this tool. If you need a robust, secure, and high‑performance FTP server, there are many more suitable alternatives available.
+
+
+
+# spyftpd
+
+
+spyFtpD (Simple Python FTP Daemon) is a lightweight command‑line wrapper around the [pyftpdlib](https://github.com/giampaolo/pyftpdlib) library, giving you a quick way to launch an FTP server without dealing with configuration files or setup overhead.
+
+## Quick start
+- Dependencies:
+   - "pyasyncore >= '3.12'"
+   - "pyasynchat >= '3.12'"
+- Install 
+  - Binary: download and add to $PATH
+  
+## Examples
+```bash
+# Start FTP server with anonymous read-only access
+spyftpd -a .
+```
+
+## License
+- Licensed under the MIT License — see LICENSE.
+
+## Further remarks
+
+Security and hardening are intentionally not priorities of this tool. If you need a robust, secure, and high‑performance FTP server, there are many more suitable alternatives available.
