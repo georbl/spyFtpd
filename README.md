@@ -12,7 +12,7 @@ spyFtpD (Simple Python FTP Daemon) is a lightweight command‑line wrapper aroun
 ## Examples
 ```bash
 # Start FTP server with anonymous read-only access
-spyftpd -a .
+spyftpd.py -a .
 ```
 
 ## License
@@ -21,4 +21,5 @@ spyftpd -a .
 ## Further remarks
 
 Security and hardening are intentionally not priorities of this tool. If you need a robust, secure, and high‑performance FTP server, there are many more suitable alternatives available.
+
 
